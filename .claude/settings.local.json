@@ -7,7 +7,12 @@
       "Bash(npm run build:*)",
       "Bash(git add:*)",
       "Bash(findstr:*)",
-      "Bash(del nul)"
+      "Bash(del nul)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial release of Grok CLI v1.0.0\n\n- Add interactive chat mode powered by Grok API\n- Implement Claude Code-inspired UX with slash commands\n- Add /help, /clear, /exit, /version commands\n- Create beautiful terminal UI with colors\n- Add conversation history tracking\n- Implement TypeScript-based architecture\n- Add comprehensive documentation and examples\n- Configure MIT License for open source\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git config:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(git remote:*)"
     ],
     "deny": [],
     "ask": []
