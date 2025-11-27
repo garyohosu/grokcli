@@ -12,7 +12,10 @@
       "Bash(git config:*)",
       "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "Bash(git remote:*)"
+      "Bash(git remote:*)",
+      "WebSearch",
+      "Bash(git commit -m \"$(cat <<''EOF''\nFix opening message alignment and Grok API 404 error\n\n- Fix opening message box alignment - properly aligned text within borders\n- Fix 404 error by updating model name from ''grok-beta'' to ''grok-2-1212''\n- Add /version command to opening message command list\n- Improve command list formatting (removed dashes for cleaner look)\n- Clean up package-lock.json (remove unused dependencies)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

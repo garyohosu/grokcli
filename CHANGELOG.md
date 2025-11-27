@@ -12,16 +12,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Agents.md - Instructions for AI agents working on this project
 - Automated workflow for reading CHANGELOG.md on startup and updating it after work completion
 - Added /version command to opening message command list
+- Added /exec command for executing shell commands directly from Grok CLI
+- Command execution functionality with proper error handling and output display
 
 ### Changed
 - Updated project documentation structure to include AI workflow guidelines
 - Improved opening message alignment - fixed box border spacing issues
+- Simplified opening message layout for better readability
+- Enhanced help command to include /exec usage information
 
 ### Fixed
 - Fixed opening message box alignment - properly aligned text within the box borders
 - Fixed 404 error from Grok API - updated model name from 'grok-beta' to 'grok-2-1212'
 - Improved command list formatting in opening message
 - Corrected opening message right border spacing - adjusted text padding to match box width exactly
+- Removed extra vertical lines on right side of opening message box
 
 ## [1.0.0] - 2025-11-27
 

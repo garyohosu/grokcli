@@ -4,16 +4,18 @@ import chalk from 'chalk';
 import * as readline from 'readline';
 import { GrokClient } from './grok-client';
 import * as dotenv from 'dotenv';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 dotenv.config();
 
 const OPENING_MESSAGE = `
 ${chalk.cyan('╔══════════════════════════════════════════════════════════════╗')}
+${chalk.cyan('║')} ${chalk.bold('Grok CLI')} ${chalk.gray('- Interactive AI assistant in your terminal')}   ${chalk.cyan('║')}
 ${chalk.cyan('║')}                                                              ${chalk.cyan('║')}
-${chalk.cyan('║')}   ${chalk.bold('Grok CLI')} ${chalk.gray('- Interactive AI assistant in your terminal')}     ${chalk.cyan('║')}
-${chalk.cyan('║')}                                                              ${chalk.cyan('║')}
-${chalk.cyan('║')}   ${chalk.dim('Powered by Grok')}                                          ${chalk.cyan('║')}
-${chalk.cyan('║')}                                                              ${chalk.cyan('║')}
+${chalk.cyan('║')} ${chalk.dim('Powered by Grok')}                                            ${chalk.cyan('║')}
 ${chalk.cyan('╚══════════════════════════════════════════════════════════════╝')}
 
 Available commands:
@@ -21,6 +23,7 @@ Available commands:
   ${chalk.cyan('/clear')}    Clear conversation history
   ${chalk.cyan('/exit')}     Exit the application
   ${chalk.cyan('/version')}  Show version information
+  ${chalk.cyan('/exec')}     Execute shell command
 
 Just type your message to chat with Grok AI
 `;
@@ -29,10 +32,11 @@ function showHelp() {
   console.log(`
 ${chalk.bold('Grok CLI Commands:')}
 
-  ${chalk.cyan('/help')}     Show this help message
-  ${chalk.cyan('/clear')}    Clear the conversation history
-  ${chalk.cyan('/exit')}     Exit the application
-  ${chalk.cyan('/version')}  Show version information
+  ${chalk.cyan('/help')}           Show this help message
+  ${chalk.cyan('/clear')}          Clear the conversation history
+  ${chalk.cyan('/exit')}           Exit the application
+  ${chalk.cyan('/version')}        Show version information
+  ${chalk.cyan('/exec <command>')} Execute shell command
 
 ${chalk.dim('Just type your message to chat with Grok AI')}
 `);
@@ -47,6 +51,34 @@ Powered by Grok API
 
 async function handleCommand(command: string, grokClient: GrokClient): Promise<boolean> {
   const cmd = command.toLowerCase();
+
+  // Handle /exec command separately as it needs the full command string
+  if (command.startsWith('/exec ')) {
+    const shellCommand = command.substring(6).trim();
+    if (!shellCommand) {
+      console.log(chalk.yellow('\nPlease provide a command to execute'));
+      console.log(chalk.dim('Usage: /exec <command>\n'));
+      return true;
+    }
+
+    try {
+      console.log(chalk.dim(`\nExecuting: ${shellCommand}\n`));
+      const { stdout, stderr } = await execAsync(shellCommand);
+
+      if (stdout) {
+        console.log(stdout);
+      }
+      if (stderr) {
+        console.error(chalk.yellow(stderr));
+      }
+      console.log(chalk.dim('Command completed.\n'));
+    } catch (error: any) {
+      console.error(chalk.red('Error executing command:'), error.message);
+      if (error.stdout) console.log(error.stdout);
+      if (error.stderr) console.error(chalk.yellow(error.stderr));
+    }
+    return true;
+  }
 
   switch (cmd) {
     case '/help':
@@ -69,6 +101,11 @@ async function handleCommand(command: string, grokClient: GrokClient): Promise<b
     case '/version':
     case '/v':
       showVersion();
+      return true;
+
+    case '/exec':
+      console.log(chalk.yellow('\nPlease provide a command to execute'));
+      console.log(chalk.dim('Usage: /exec <command>\n'));
       return true;
 
     default:
