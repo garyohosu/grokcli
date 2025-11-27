@@ -1,14 +1,18 @@
 # File Structure Specification
 
-## User-facing files
+This document lists all files used by Agent Mode.
+
+## User-facing files (editable)
 
 - goal.md
 - interview.md
 - Agents.md
 
-## Auto-generated files (never edited manually)
+These files define the agent's behavior and user intent.
 
-Stored under .grok_agent/:
+## Auto-generated files (non-editable)
+
+Located in .grok_agent/:
 
 - planner.md
 - executor.md
@@ -17,4 +21,10 @@ Stored under .grok_agent/:
 - final_report.md
 - state.json
 
-These files are recreated every time the goal changes.
+These files are created and overwritten automatically.
+
+## Reset Rule
+
+If goal.md changes:
+- All auto-generated files are deleted by TypeScript.
+- A clean cycle begins.

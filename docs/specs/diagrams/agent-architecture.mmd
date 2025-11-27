@@ -1,1 +1,18 @@
-%% Mermaid diagram placeholder
+%% Mermaid diagram — GrokCLI Architecture
+
+flowchart TD
+
+A[CLI Layer (TypeScript)]
+    --> B[Agent Layer (Agents.md)]
+B --> C[.grok_agent Workspace]
+
+A --> C
+
+subgraph Filesystem
+    C --> D[planner.md]
+    C --> E[executor.md]
+    C --> F[result.md]
+    C --> G[reviewer.md]
+    C --> H[final_report.md]
+    C --> I[state.json]
+end

@@ -1,29 +1,49 @@
-# Architecture Overview
+# Architecture — GrokCLI Agent Mode
 
-The system consists of three main layers:
+This document describes the layered architecture used by GrokCLI.
 
-## 1. CLI Layer (TypeScript)
+## Layer 1 — CLI Layer (TypeScript)
 
-Handles:
+**Responsibilities:**
 - File I/O
-- Hashing of goal.md
-- Cleanup of generated files
-- Process orchestration
+- Read/write .grok_agent/ files
+- Hash computation for goal.md
+- Resetting generated files when the goal changes
+- Orchestration of planner/executor/reviewer steps
+- Interaction with the Grok API
 
-## 2. Agent Layer (AI)
+**Files involved:**
+- src/agent/runner.ts
+- src/agent/reset.ts
+- src/utils/hash.ts
 
-Implemented in Agents.md:
-- Planning
-- Execution prompt generation
-- Reviewing results
-- Producing the final report
+## Layer 2 — Agent Layer (AI)
 
-## 3. Workspace Layer
+**Responsibilities:**
+- Defines behavior in Agents.md
+- Generates:
+  - planner.md
+  - executor.md
+  - result.md
+  - reviewer.md
+  - final_report.md
 
-.grok_agent/ contains:
+**Rules:**
+- Must always output in the user's language
+- Must follow the task loop
+- Must regenerate files when reset
+
+## Layer 3 — Workspace Layer (.grok_agent/)
+
+**Generated files:**
 - planner.md
 - executor.md
 - result.md
 - reviewer.md
 - final_report.md
 - state.json
+
+**Rules:**
+- Should not be edited manually
+- Should not be committed to Git
+- Should always reflect current goal.md

@@ -1,1 +1,40 @@
-%% Mermaid diagram placeholder
+%% Mermaid diagram — Full Agent Mode Sequence
+
+sequenceDiagram
+    autonumber
+    participant User
+    participant CLI
+    participant Agent
+    participant FS
+    participant GA
+
+    User->>CLI: grokcli agents
+    CLI->>FS: ensure workspace
+    CLI->>FS: reset if goal changed
+    FS-->>CLI: ready
+
+    loop up to 5
+        CLI->>Agent: request planner.md
+        Agent-->>CLI: planner.md
+        CLI->>GA: write planner
+
+        CLI->>Agent: request executor.md
+        Agent-->>CLI: executor.md
+        CLI->>GA: write executor
+
+        CLI->>Agent: execute and request result.md
+        Agent-->>CLI: result.md
+        CLI->>GA: write result
+
+        CLI->>Agent: request reviewer.md
+        Agent-->>CLI: reviewer.md
+        CLI->>GA: write reviewer
+
+        Agent-->>CLI: goal satisfied?
+    end
+
+    alt yes
+        CLI->>Agent: request final report
+        Agent-->>CLI: final_report.md
+        CLI->>GA: write final report
+    end

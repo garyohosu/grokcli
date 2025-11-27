@@ -9,16 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Created new feature branch `agent-mode-specs` for upcoming documentation and agent-mode development
-- **Documentation structure** - Complete documentation folder hierarchy
+- **Documentation structure** - Complete documentation folder hierarchy with full specifications
 - docs/index.md - Main documentation entry point
 - docs/quickstart.md - Installation and usage guide
 - docs/agent-mode.md - Agent Mode overview
-- docs/specs/agent-mode-sequence.md - Sequence diagram specification
-- docs/specs/agent-workflow.md - Detailed workflow specification
-- docs/specs/architecture.md - System architecture documentation
-- docs/specs/file-structure.md - File organization specification
-- docs/specs/diagrams/agent-mode-sequence.mmd - Mermaid sequence diagram placeholder
-- docs/specs/diagrams/agent-architecture.mmd - Mermaid architecture diagram placeholder
+- docs/specs/agent-mode-sequence.md - Complete sequence diagram specification with Mermaid diagram
+- docs/specs/agent-workflow.md - Detailed 8-phase workflow specification (requirements, goal, planning, execution, review, final report, looping, reset)
+- docs/specs/architecture.md - Three-layer system architecture (CLI, Agent, Workspace)
+- docs/specs/file-structure.md - Complete file structure specification with reset rules
+- docs/specs/diagrams/agent-mode-sequence.mmd - Full Mermaid sequence diagram (User → CLI → Agent → FS → .grok_agent/)
+- docs/specs/diagrams/agent-architecture.mmd - Mermaid architecture flowchart (CLI Layer → Agent Layer → Workspace Layer)
 - Claude.md - Workflow instructions for Claude Code integration
 - Agents.md - Instructions for AI agents working on this project
 - Automated workflow for reading CHANGELOG.md on startup and updating it after work completion
