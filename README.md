@@ -45,12 +45,14 @@ npm install -g grokcli
 
 ```bash
 GROK_API_KEY=your_api_key_here
+SERPAPI_KEY=your_serpapi_key_here
 ```
 
-Or set the environment variable:
+Or set the environment variables:
 
 ```bash
 export GROK_API_KEY=your_api_key_here
+export SERPAPI_KEY=your_serpapi_key_here
 ```
 
 ## Usage
@@ -75,7 +77,11 @@ Inside the interactive mode, you can use these commands:
 - `/clear` - Clear conversation history
 - `/exit` - Exit the application
 - `/version` - Show version information
+- `/model [name|list]` - View or switch the active model
+- `/search <query>` - Search the web using SerpAPI
 - `/exec <command>` - Execute shell command directly
+
+
 
 ### Single Question Mode
 

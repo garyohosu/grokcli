@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated chat method to use instance model instead of parameter
 - Enhanced help command to include model management commands
 - Updated opening message to include /model command
+- Clarified README command list to remove the non-existent /verbose entry and document SerpAPI-based /search command and configuration.
 
 ### Fixed
 - Fixed opening message box alignment - properly aligned text within the box borders
@@ -115,3 +116,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Command reference and examples
 
 [1.0.0]: https://github.com/yourusername/grokcli/releases/tag/v1.0.0
+
+
