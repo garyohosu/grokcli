@@ -19,7 +19,8 @@
       "WebFetch(domain:docs.x.ai)",
       "Bash(git checkout:*)",
       "Bash(mkdir:*)",
-      "Bash(npm start)"
+      "Bash(npm start)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []
