@@ -31,6 +31,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Final report rules: polished reader-ready output generation
   - Loop control: maximum 5 iterations with partial results
   - Safety boundaries: workspace restrictions and deterministic behavior
+- **interview.md** - Interactive goal interviewer prompt for Agent Mode
+  - Language rule: output matches user input language
+  - Conversation objective: understand user intent and refine goal
+  - Interaction pattern: rewritten goal proposal + suggestions + questions
+  - Stop condition: detect user acceptance and output FINAL_GOAL: format
+  - Restrictions: focus only on goal definition, no task execution
+  - First message protocol: greeting and "What would you like the AI agent to achieve?"
 - Claude.md - Workflow instructions for Claude Code integration
 - Automated workflow for reading CHANGELOG.md on startup and updating it after work completion
 - **Global configuration directory** - Load .env from `~/.grokcli/.env` (macOS/Linux) or `%USERPROFILE%\.grokcli\.env` (Windows)
