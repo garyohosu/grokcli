@@ -19,8 +19,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - docs/specs/file-structure.md - Complete file structure specification with reset rules
 - docs/specs/diagrams/agent-mode-sequence.mmd - Full Mermaid sequence diagram (User → CLI → Agent → FS → .grok_agent/)
 - docs/specs/diagrams/agent-architecture.mmd - Mermaid architecture flowchart (CLI Layer → Agent Layer → Workspace Layer)
+- **Agents.md** - Complete autonomous agent controller prompt
+  - Language rule: output matches user input language
+  - Core responsibilities: plan → execute → review loop
+  - Workspace rules: .grok_agent/ directory management
+  - Goal handling: goal.md reading and reset detection
+  - Planner rules: task decomposition and structured planning
+  - Executor rules: instruction generation for GrokCLI tools
+  - Result rules: output collection and documentation
+  - Reviewer rules: goal satisfaction evaluation with GOAL_SATISFIED flag
+  - Final report rules: polished reader-ready output generation
+  - Loop control: maximum 5 iterations with partial results
+  - Safety boundaries: workspace restrictions and deterministic behavior
 - Claude.md - Workflow instructions for Claude Code integration
-- Agents.md - Instructions for AI agents working on this project
 - Automated workflow for reading CHANGELOG.md on startup and updating it after work completion
 - **Global configuration directory** - Load .env from `~/.grokcli/.env` (macOS/Linux) or `%USERPROFILE%\.grokcli\.env` (Windows)
 - Config loading utility module (src/config.ts) with fallback to local .env
