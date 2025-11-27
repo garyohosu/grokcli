@@ -49,6 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Configuration loading** - Now loads from global `~/.grokcli/.env` directory first, with fallback to local .env
 - Updated README.md with comprehensive global config setup instructions for all platforms
+- Migrated local .env to global ~/.grokcli/.env directory for cross-directory accessibility
+- Rebuilt project with global configuration support
 - Integrated feature/search-api and feature/file-tools into master, unifying web search and file operation tools for function calling
 - Updated project documentation structure to include AI workflow guidelines
 - Improved opening message alignment - fixed box border spacing issues
