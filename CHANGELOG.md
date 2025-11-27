@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Created new feature branch `agent-mode-specs` for upcoming documentation and agent-mode development
 - Claude.md - Workflow instructions for Claude Code integration
 - Agents.md - Instructions for AI agents working on this project
 - Automated workflow for reading CHANGELOG.md on startup and updating it after work completion
