@@ -56,8 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated chat method to use instance model instead of parameter
 - Enhanced help command to include model management commands
 - Updated opening message to include /model command
-- Clarified README command list to remove the non-existent /verbose entry and document SerpAPI-based /search command and configuration.
-
+- Clarified README to remove the non-existent /verbose command and note /search uses SerpAPI with SERPAPI_KEY configuration
 ### Fixed
 - Fixed opening message box alignment - properly aligned text within the box borders
 - Fixed 404 error from Grok API - updated model name from 'grok-beta' to 'grok-2-1212'
