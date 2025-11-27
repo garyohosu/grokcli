@@ -9,6 +9,8 @@ A command-line interface tool powered by the Grok API, providing an AI assistant
 - 🎨 Beautiful terminal UI with colors
 - 📝 Conversation history support
 - ⚡ Fast and lightweight
+- 🛠️ Function calling support - Grok can execute shell commands when needed
+- 🖥️ Cross-platform command execution (Windows/Linux/macOS)
 
 ## Installation
 
@@ -65,6 +67,16 @@ grokcli chat
 
 Type your questions and get responses in real-time. Type `exit` or `quit` to end the session.
 
+### Available Commands
+
+Inside the interactive mode, you can use these commands:
+
+- `/help` - Show available commands
+- `/clear` - Clear conversation history
+- `/exit` - Exit the application
+- `/version` - Show version information
+- `/exec <command>` - Execute shell command directly
+
 ### Single Question Mode
 
 Ask a single question:
@@ -72,6 +84,28 @@ Ask a single question:
 ```bash
 grokcli "What is the meaning of life?"
 ```
+
+### Function Calling (AI-Powered Command Execution)
+
+Grok CLI now supports function calling! When you ask Grok to perform system-related tasks, it can automatically execute shell commands:
+
+```bash
+> List all files in the current directory
+
+# Grok will automatically execute the appropriate command:
+# - Windows: dir
+# - Linux/macOS: ls -la
+```
+
+The AI automatically detects your operating system and uses the correct commands. You can ask Grok to:
+
+- Check system information
+- List files and directories
+- View file contents
+- Run development commands (npm, git, etc.)
+- And much more!
+
+**Note:** Shell commands are executed with the same permissions as your terminal session. Be cautious when allowing command execution.
 
 ## Development
 

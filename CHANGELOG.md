@@ -14,12 +14,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added /version command to opening message command list
 - Added /exec command for executing shell commands directly from Grok CLI
 - Command execution functionality with proper error handling and output display
+- **Function calling support** - Grok AI can now execute shell commands automatically when needed
+- OS detection utility to distinguish between Windows, Linux, and macOS
+- Cross-platform shell command execution with OS-specific command handling
+- Tool definitions for shell command execution with proper parameter validation
+- Iterative tool call handling with conversation context preservation
 
 ### Changed
 - Updated project documentation structure to include AI workflow guidelines
 - Improved opening message alignment - fixed box border spacing issues
 - Simplified opening message layout for better readability
 - Enhanced help command to include /exec usage information
+- Enhanced Grok client to support OpenAI-compatible function calling API
+- Modified chat function to handle tool calls in a loop until final response
+- Updated README.md with function calling documentation and examples
 
 ### Fixed
 - Fixed opening message box alignment - properly aligned text within the box borders

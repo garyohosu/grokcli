@@ -1,9 +1,39 @@
 import axios, { AxiosInstance } from 'axios';
 import ora from 'ora';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import * as os from 'os';
+
+const execAsync = promisify(exec);
+
+interface ToolCall {
+  id: string;
+  type: 'function';
+  function: {
+    name: string;
+    arguments: string;
+  };
+}
 
 interface GrokMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
+  role: 'system' | 'user' | 'assistant' | 'tool';
+  content: string | null;
+  tool_calls?: ToolCall[];
+  tool_call_id?: string;
+  name?: string;
+}
+
+interface Tool {
+  type: 'function';
+  function: {
+    name: string;
+    description: string;
+    parameters: {
+      type: 'object';
+      properties: Record<string, any>;
+      required: string[];
+    };
+  };
 }
 
 interface GrokChatRequest {
@@ -11,6 +41,8 @@ interface GrokChatRequest {
   model: string;
   stream?: boolean;
   temperature?: number;
+  tools?: Tool[];
+  tool_choice?: 'auto' | 'none' | 'required';
 }
 
 interface GrokChatResponse {
@@ -30,9 +62,67 @@ interface GrokChatResponse {
   };
 }
 
+function getOSType(): 'windows' | 'linux' | 'darwin' {
+  const platform = os.platform();
+  if (platform === 'win32') return 'windows';
+  if (platform === 'darwin') return 'darwin';
+  return 'linux';
+}
+
+function getShellTools(): Tool[] {
+  const osType = getOSType();
+  const exampleCommand = osType === 'windows' ? 'dir' : 'ls -la';
+
+  return [
+    {
+      type: 'function',
+      function: {
+        name: 'execute_shell_command',
+        description: `Execute a shell command on the ${osType} system. Use appropriate commands for ${osType}. ${osType === 'windows' ? 'Windows commands: dir, echo, type, etc.' : 'Unix commands: ls, cat, grep, etc.'}`,
+        parameters: {
+          type: 'object',
+          properties: {
+            command: {
+              type: 'string',
+              description: `The shell command to execute. Must be appropriate for ${osType}. Example: ${exampleCommand}`,
+            },
+            reason: {
+              type: 'string',
+              description: 'Brief explanation of why this command needs to be executed',
+            },
+          },
+          required: ['command', 'reason'],
+        },
+      },
+    },
+  ];
+}
+
+async function executeShellCommand(command: string): Promise<string> {
+  try {
+    const { stdout, stderr } = await execAsync(command);
+    let result = '';
+
+    if (stdout) {
+      result += `Output:\n${stdout}`;
+    }
+    if (stderr) {
+      result += `\n\nWarnings/Errors:\n${stderr}`;
+    }
+
+    return result || 'Command executed successfully with no output.';
+  } catch (error: any) {
+    let errorMsg = `Error executing command: ${error.message}`;
+    if (error.stdout) errorMsg += `\n\nOutput:\n${error.stdout}`;
+    if (error.stderr) errorMsg += `\n\nError details:\n${error.stderr}`;
+    return errorMsg;
+  }
+}
+
 export class GrokClient {
   private client: AxiosInstance;
   private conversationHistory: GrokMessage[] = [];
+  private tools: Tool[];
 
   constructor(apiKey: string, baseURL: string = 'https://api.x.ai/v1') {
     this.client = axios.create({
@@ -42,6 +132,7 @@ export class GrokClient {
         'Content-Type': 'application/json',
       },
     });
+    this.tools = getShellTools();
   }
 
   async chat(message: string, model: string = 'grok-2-1212'): Promise<string> {
@@ -53,20 +144,62 @@ export class GrokClient {
         content: message,
       });
 
-      const request: GrokChatRequest = {
-        messages: this.conversationHistory,
-        model,
-        stream: false,
-        temperature: 0.7,
-      };
+      let iterations = 0;
+      const maxIterations = 10; // Prevent infinite loops
 
-      const response = await this.client.post<GrokChatResponse>('/chat/completions', request);
+      while (iterations < maxIterations) {
+        iterations++;
 
-      const assistantMessage = response.data.choices[0].message;
-      this.conversationHistory.push(assistantMessage);
+        const request: GrokChatRequest = {
+          messages: this.conversationHistory,
+          model,
+          stream: false,
+          temperature: 0.7,
+          tools: this.tools,
+          tool_choice: 'auto',
+        };
 
-      spinner.succeed('Done');
-      return assistantMessage.content;
+        const response = await this.client.post<GrokChatResponse>('/chat/completions', request);
+        const assistantMessage = response.data.choices[0].message;
+
+        // Add assistant message to history
+        this.conversationHistory.push(assistantMessage);
+
+        // Check if there are tool calls
+        if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
+          spinner.text = 'Executing commands...';
+
+          // Execute each tool call
+          for (const toolCall of assistantMessage.tool_calls) {
+            if (toolCall.function.name === 'execute_shell_command') {
+              const args = JSON.parse(toolCall.function.arguments);
+              const osType = getOSType();
+
+              spinner.text = `Executing: ${args.command} (${args.reason})`;
+
+              const result = await executeShellCommand(args.command);
+
+              // Add tool response to conversation
+              this.conversationHistory.push({
+                role: 'tool',
+                tool_call_id: toolCall.id,
+                name: toolCall.function.name,
+                content: result,
+              });
+            }
+          }
+
+          // Continue the loop to get the next response
+          continue;
+        }
+
+        // No tool calls, return the final response
+        spinner.succeed('Done');
+        return assistantMessage.content || 'No response from Grok.';
+      }
+
+      spinner.warn('Max iterations reached');
+      return 'Conversation reached maximum iterations.';
     } catch (error) {
       spinner.fail('Error');
       if (axios.isAxiosError(error)) {
