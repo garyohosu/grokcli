@@ -10,18 +10,19 @@ dotenv.config();
 const OPENING_MESSAGE = `
 ${chalk.cyan('╔══════════════════════════════════════════════════════════════╗')}
 ${chalk.cyan('║')}                                                              ${chalk.cyan('║')}
-${chalk.cyan('║')}   ${chalk.bold('Grok CLI')} ${chalk.gray('- Interactive AI assistant in your terminal')}  ${chalk.cyan('║')}
+${chalk.cyan('║')}   ${chalk.bold('Grok CLI')} ${chalk.gray('- Interactive AI assistant in your terminal')}   ${chalk.cyan('║')}
 ${chalk.cyan('║')}                                                              ${chalk.cyan('║')}
-${chalk.cyan('║')}   ${chalk.dim('Powered by Grok')}                                          ${chalk.cyan('║')}
+${chalk.cyan('║')}   ${chalk.dim('Powered by Grok')}                                           ${chalk.cyan('║')}
 ${chalk.cyan('║')}                                                              ${chalk.cyan('║')}
 ${chalk.cyan('╚══════════════════════════════════════════════════════════════╝')}
 
 Available commands:
-  ${chalk.cyan('/help')}    - Show available commands
-  ${chalk.cyan('/clear')}   - Clear conversation history
-  ${chalk.cyan('/exit')}    - Exit the application
+  ${chalk.cyan('/help')}     Show available commands
+  ${chalk.cyan('/clear')}    Clear conversation history
+  ${chalk.cyan('/exit')}     Exit the application
+  ${chalk.cyan('/version')}  Show version information
 
-Type your message to start chatting...
+Just type your message to chat with Grok AI
 `;
 
 function showHelp() {

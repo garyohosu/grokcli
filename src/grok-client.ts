@@ -44,7 +44,7 @@ export class GrokClient {
     });
   }
 
-  async chat(message: string, model: string = 'grok-beta'): Promise<string> {
+  async chat(message: string, model: string = 'grok-2-1212'): Promise<string> {
     const spinner = ora('Thinking...').start();
 
     try {

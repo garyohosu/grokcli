@@ -11,9 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Claude.md - Workflow instructions for Claude Code integration
 - Agents.md - Instructions for AI agents working on this project
 - Automated workflow for reading CHANGELOG.md on startup and updating it after work completion
+- Added /version command to opening message command list
 
 ### Changed
 - Updated project documentation structure to include AI workflow guidelines
+- Improved opening message alignment - fixed box border spacing issues
+
+### Fixed
+- Fixed opening message box alignment - properly aligned text within the box borders
+- Fixed 404 error from Grok API - updated model name from 'grok-beta' to 'grok-2-1212'
+- Improved command list formatting in opening message
 
 ## [1.0.0] - 2025-11-27
 
