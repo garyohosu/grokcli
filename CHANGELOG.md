@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - src/tools/fileTools.ts module with sandboxed file operations
 
 ### Changed
+- Integrated feature/search-api and feature/file-tools into master, unifying web search and file operation tools for function calling
 - Updated project documentation structure to include AI workflow guidelines
 - Improved opening message alignment - fixed box border spacing issues
 - Simplified opening message layout for better readability
