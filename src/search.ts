@@ -12,14 +12,8 @@ interface DuckDuckGoResult {
   }>;
 }
 
-/**
- * Search DuckDuckGo with a query
- * @param query - The search query
- * @param silent - If true, don't show spinner (for function calling)
- * @returns Formatted search results
- */
-export async function search(query: string, silent: boolean = false): Promise<string> {
-  const spinner = silent ? null : ora('Searching DuckDuckGo...').start();
+export async function search(query: string): Promise<string> {
+  const spinner = ora('Searching DuckDuckGo...').start();
 
   try {
     const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_redirect=1`;
@@ -27,9 +21,7 @@ export async function search(query: string, silent: boolean = false): Promise<st
     const response = await axios.get<DuckDuckGoResult>(url);
     const data = response.data;
 
-    if (spinner) {
-      spinner.succeed('Search completed');
-    }
+    spinner.succeed('Search completed');
 
     // Build the formatted result
     let result = '\n';
@@ -68,9 +60,7 @@ export async function search(query: string, silent: boolean = false): Promise<st
     return result;
 
   } catch (error) {
-    if (spinner) {
-      spinner.fail('Search failed');
-    }
+    spinner.fail('Search failed');
 
     if (axios.isAxiosError(error)) {
       throw new Error(`DuckDuckGo API error: ${error.response?.data?.error || error.message}`);

@@ -4,7 +4,6 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
 import chalk from 'chalk';
-import { search as duckDuckGoSearch } from './search';
 
 const execAsync = promisify(exec);
 
@@ -71,7 +70,7 @@ function getOSType(): 'windows' | 'linux' | 'darwin' {
   return 'linux';
 }
 
-function getAllTools(): Tool[] {
+function getShellTools(): Tool[] {
   const osType = getOSType();
   const exampleCommand = osType === 'windows' ? 'dir' : 'ls -la';
 
@@ -94,23 +93,6 @@ function getAllTools(): Tool[] {
             },
           },
           required: ['command', 'reason'],
-        },
-      },
-    },
-    {
-      type: 'function',
-      function: {
-        name: 'search_web',
-        description: 'Search the web using DuckDuckGo. Use this to find current information, answer questions, or research topics on the internet.',
-        parameters: {
-          type: 'object',
-          properties: {
-            query: {
-              type: 'string',
-              description: 'The search query. Be specific and clear. Example: "current prime minister of Japan"',
-            },
-          },
-          required: ['query'],
         },
       },
     },
@@ -207,7 +189,7 @@ export class GrokClient {
         'Content-Type': 'application/json',
       },
     });
-    this.tools = getAllTools();
+    this.tools = getShellTools();
   }
 
   async chat(message: string): Promise<string> {
@@ -244,12 +226,13 @@ export class GrokClient {
 
         // Check if there are tool calls
         if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
-          spinner.text = 'Executing tools...';
+          spinner.text = 'Executing commands...';
 
           // Execute each tool call
           for (const toolCall of assistantMessage.tool_calls) {
             if (toolCall.function.name === 'execute_shell_command') {
               const args = JSON.parse(toolCall.function.arguments);
+              const osType = getOSType();
 
               spinner.text = `Executing: ${args.command} (${args.reason})`;
 
@@ -262,30 +245,6 @@ export class GrokClient {
                 name: toolCall.function.name,
                 content: result,
               });
-            } else if (toolCall.function.name === 'search_web') {
-              const args = JSON.parse(toolCall.function.arguments);
-
-              spinner.text = `Searching: ${args.query}`;
-
-              try {
-                const result = await duckDuckGoSearch(args.query, true);
-
-                // Add tool response to conversation
-                this.conversationHistory.push({
-                  role: 'tool',
-                  tool_call_id: toolCall.id,
-                  name: toolCall.function.name,
-                  content: result,
-                });
-              } catch (error: any) {
-                // Add error response to conversation
-                this.conversationHistory.push({
-                  role: 'tool',
-                  tool_call_id: toolCall.id,
-                  name: toolCall.function.name,
-                  content: `Error: ${error.message}`,
-                });
-              }
             }
           }
 

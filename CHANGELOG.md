@@ -33,8 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Search result display with title, summary, URL, and related topics
 - Loading spinner for search operations
 - Comprehensive error handling for search failures
-- **Web search function calling** - Grok AI can now search the web automatically when needed
-- `search_web` tool for function calling API integration
 
 ### Changed
 - Updated project documentation structure to include AI workflow guidelines
@@ -50,9 +48,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated opening message to include /model command
 - Enhanced help command and opening message to include /search command
 - Updated README.md with DuckDuckGo search feature documentation
-- Renamed `getShellTools()` to `getAllTools()` to reflect multiple tool types
-- Enhanced search function with silent mode for function calling integration
-- Updated tool execution to support both shell commands and web searches
 
 ### Fixed
 - Fixed opening message box alignment - properly aligned text within the box borders
