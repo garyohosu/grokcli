@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved command list formatting in opening message
 - Corrected opening message right border spacing - adjusted text padding to match box width exactly
 - Removed extra vertical lines on right side of opening message box
+- Adjusted spacing in opening message - added 6 spaces to line 2 and 2 spaces to line 4 for perfect alignment
 
 ## [1.0.0] - 2025-11-27
 
