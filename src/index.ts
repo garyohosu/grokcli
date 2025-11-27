@@ -6,6 +6,7 @@ import { GrokClient } from './grok-client';
 import * as dotenv from 'dotenv';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { webSearch } from './tools/searchApi';
 
 const execAsync = promisify(exec);
 
@@ -22,6 +23,7 @@ Available commands:
   ${chalk.cyan('/help')}     Show available commands
   ${chalk.cyan('/clear')}    Clear conversation history
   ${chalk.cyan('/model')}    View or change AI model
+  ${chalk.cyan('/search')}   Search the web
   ${chalk.cyan('/exit')}     Exit the application
   ${chalk.cyan('/version')}  Show version information
   ${chalk.cyan('/exec')}     Execute shell command
@@ -33,14 +35,15 @@ function showHelp() {
   console.log(`
 ${chalk.bold('Grok CLI Commands:')}
 
-  ${chalk.cyan('/help')}           Show this help message
-  ${chalk.cyan('/clear')}          Clear the conversation history
-  ${chalk.cyan('/model')}          View current model
-  ${chalk.cyan('/model <name>')}   Change to a different model
-  ${chalk.cyan('/model list')}     List all available models
-  ${chalk.cyan('/exit')}           Exit the application
-  ${chalk.cyan('/version')}        Show version information
-  ${chalk.cyan('/exec <command>')} Execute shell command
+  ${chalk.cyan('/help')}            Show this help message
+  ${chalk.cyan('/clear')}           Clear the conversation history
+  ${chalk.cyan('/model')}           View current model
+  ${chalk.cyan('/model <name>')}    Change to a different model
+  ${chalk.cyan('/model list')}      List all available models
+  ${chalk.cyan('/search <query>')}  Search the web using SerpAPI
+  ${chalk.cyan('/exit')}            Exit the application
+  ${chalk.cyan('/version')}         Show version information
+  ${chalk.cyan('/exec <command>')}  Execute shell command
 
 ${chalk.dim('Just type your message to chat with Grok AI')}
 `);
@@ -130,6 +133,41 @@ async function handleCommand(command: string, grokClient: GrokClient): Promise<b
     return true;
   }
 
+  // Handle /search command separately as it needs the full query string
+  if (command.startsWith('/search ')) {
+    const query = command.substring(8).trim();
+    if (!query) {
+      console.log(chalk.yellow('\nPlease provide a search query'));
+      console.log(chalk.dim('Usage: /search <query>\n'));
+      return true;
+    }
+
+    try {
+      console.log(chalk.dim(`\nSearching for: ${query}\n`));
+      const result = await webSearch({ query });
+
+      console.log(chalk.bold(`Search results for: ${chalk.cyan(query)}\n`));
+
+      if (result.results.length === 0) {
+        console.log(chalk.yellow('No results found.\n'));
+      } else {
+        result.results.forEach((r, index) => {
+          console.log(chalk.bold(`${index + 1}. ${r.title}`));
+          console.log(chalk.blue(`   ${r.url}`));
+          console.log(chalk.dim(`   ${r.snippet}`));
+          console.log('');
+        });
+      }
+    } catch (error: any) {
+      console.error(chalk.red('Search error:'), error.message);
+      if (error.message.includes('Missing SERPAPI_KEY')) {
+        console.log(chalk.yellow('\nPlease set your SerpAPI key:'));
+        console.log(chalk.dim('  Add SERPAPI_KEY=your_api_key to your .env file\n'));
+      }
+    }
+    return true;
+  }
+
   // Handle /model command separately as it needs the full command string
   if (command.startsWith('/model ')) {
     const modelArg = command.substring(7).trim();
@@ -173,6 +211,12 @@ async function handleCommand(command: string, grokClient: GrokClient): Promise<b
     case '/exec':
       console.log(chalk.yellow('\nPlease provide a command to execute'));
       console.log(chalk.dim('Usage: /exec <command>\n'));
+      return true;
+
+    case '/search':
+    case '/s':
+      console.log(chalk.yellow('\nPlease provide a search query'));
+      console.log(chalk.dim('Usage: /search <query>\n'));
       return true;
 
     default:

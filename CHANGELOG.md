@@ -27,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Model alias system for convenient model switching (e.g., 'fast', '4', 'mini', 'code', 'vision')
 - Dynamic model switching without restarting the CLI
 - Model validation with helpful error messages
+- **SerpAPI web search integration** - Search the web from CLI and via function calling
+- `/search <query>` command for manual web searches
+- `webSearch` function calling tool for Grok AI to search the web automatically
+- SerpAPI integration with free tier support (100 searches/month)
+- Search results display with title, URL, and snippet
+- Proper error handling for missing API keys and failed searches
+- SERPAPI_KEY environment variable support in .env configuration
 
 ### Changed
 - Updated project documentation structure to include AI workflow guidelines

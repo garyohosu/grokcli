@@ -3,6 +3,7 @@ import ora from 'ora';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
+import { webSearch } from './tools/searchApi';
 
 const execAsync = promisify(exec);
 
@@ -92,6 +93,23 @@ function getShellTools(): Tool[] {
             },
           },
           required: ['command', 'reason'],
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'webSearch',
+        description: 'Perform a web search using SerpAPI to find up-to-date information from the internet',
+        parameters: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'The search query to execute',
+            },
+          },
+          required: ['query'],
         },
       },
     },
@@ -241,6 +259,30 @@ export class GrokClient {
                 name: toolCall.function.name,
                 content: result,
               });
+            } else if (toolCall.function.name === 'webSearch') {
+              const args = JSON.parse(toolCall.function.arguments);
+
+              spinner.text = `Searching: ${args.query}`;
+
+              try {
+                const result = await webSearch(args);
+
+                // Add tool response to conversation
+                this.conversationHistory.push({
+                  role: 'tool',
+                  tool_call_id: toolCall.id,
+                  name: toolCall.function.name,
+                  content: JSON.stringify(result),
+                });
+              } catch (error: any) {
+                // Add error response to conversation
+                this.conversationHistory.push({
+                  role: 'tool',
+                  tool_call_id: toolCall.id,
+                  name: toolCall.function.name,
+                  content: `Error: ${error.message}`,
+                });
+              }
             }
           }
 
