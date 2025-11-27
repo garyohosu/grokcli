@@ -6,7 +6,6 @@ import { GrokClient } from './grok-client';
 import * as dotenv from 'dotenv';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { search } from './search';
 
 const execAsync = promisify(exec);
 
@@ -23,8 +22,6 @@ Available commands:
   ${chalk.cyan('/help')}     Show available commands
   ${chalk.cyan('/clear')}    Clear conversation history
   ${chalk.cyan('/model')}    View or change AI model
-  ${chalk.cyan('/verbose')}  Toggle detailed model info
-  ${chalk.cyan('/search')}   Search the web with DuckDuckGo
   ${chalk.cyan('/exit')}     Exit the application
   ${chalk.cyan('/version')}  Show version information
   ${chalk.cyan('/exec')}     Execute shell command
@@ -36,16 +33,14 @@ function showHelp() {
   console.log(`
 ${chalk.bold('Grok CLI Commands:')}
 
-  ${chalk.cyan('/help')}             Show this help message
-  ${chalk.cyan('/clear')}            Clear the conversation history
-  ${chalk.cyan('/model')}            View current model
-  ${chalk.cyan('/model <name>')}     Change to a different model
-  ${chalk.cyan('/model list')}       List all available models
-  ${chalk.cyan('/verbose')}          Toggle detailed model info (shows model name and tokens)
-  ${chalk.cyan('/search <query>')}   Search the web with DuckDuckGo
-  ${chalk.cyan('/exit')}             Exit the application
-  ${chalk.cyan('/version')}          Show version information
-  ${chalk.cyan('/exec <command>')}   Execute shell command
+  ${chalk.cyan('/help')}           Show this help message
+  ${chalk.cyan('/clear')}          Clear the conversation history
+  ${chalk.cyan('/model')}          View current model
+  ${chalk.cyan('/model <name>')}   Change to a different model
+  ${chalk.cyan('/model list')}     List all available models
+  ${chalk.cyan('/exit')}           Exit the application
+  ${chalk.cyan('/version')}        Show version information
+  ${chalk.cyan('/exec <command>')} Execute shell command
 
 ${chalk.dim('Just type your message to chat with Grok AI')}
 `);
@@ -106,24 +101,6 @@ function changeModel(grokClient: GrokClient, modelName: string) {
 
 async function handleCommand(command: string, grokClient: GrokClient): Promise<boolean> {
   const cmd = command.toLowerCase();
-
-  // Handle /search command separately as it needs the full command string
-  if (command.startsWith('/search ')) {
-    const searchQuery = command.substring(8).trim();
-    if (!searchQuery) {
-      console.log(chalk.yellow('\nPlease provide a search query'));
-      console.log(chalk.dim('Usage: /search <query>\n'));
-      return true;
-    }
-
-    try {
-      const result = await search(searchQuery);
-      console.log(result);
-    } catch (error: any) {
-      console.error(chalk.red('Search error:'), error.message);
-    }
-    return true;
-  }
 
   // Handle /exec command separately as it needs the full command string
   if (command.startsWith('/exec ')) {
@@ -193,25 +170,9 @@ async function handleCommand(command: string, grokClient: GrokClient): Promise<b
       showVersion();
       return true;
 
-    case '/verbose':
-      const newVerboseState = !grokClient.getVerboseMode();
-      grokClient.setVerboseMode(newVerboseState);
-      if (newVerboseState) {
-        console.log(`\n${chalk.green('✓')} Verbose mode ${chalk.bold('enabled')}`);
-        console.log(chalk.dim('Model name and token usage will be shown after each response\n'));
-      } else {
-        console.log(`\n${chalk.yellow('○')} Verbose mode ${chalk.bold('disabled')}\n`);
-      }
-      return true;
-
     case '/exec':
       console.log(chalk.yellow('\nPlease provide a command to execute'));
       console.log(chalk.dim('Usage: /exec <command>\n'));
-      return true;
-
-    case '/search':
-      console.log(chalk.yellow('\nPlease provide a search query'));
-      console.log(chalk.dim('Usage: /search <query>\n'));
       return true;
 
     default:

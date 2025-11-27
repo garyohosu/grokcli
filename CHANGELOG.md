@@ -27,12 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Model alias system for convenient model switching (e.g., 'fast', '4', 'mini', 'code', 'vision')
 - Dynamic model switching without restarting the CLI
 - Model validation with helpful error messages
-- **DuckDuckGo Search Integration** - Search the web directly from the CLI
-- `/search <query>` command to perform web searches using DuckDuckGo API
-- API-key-free web search functionality with formatted results
-- Search result display with title, summary, URL, and related topics
-- Loading spinner for search operations
-- Comprehensive error handling for search failures
 
 ### Changed
 - Updated project documentation structure to include AI workflow guidelines
@@ -46,8 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated chat method to use instance model instead of parameter
 - Enhanced help command to include model management commands
 - Updated opening message to include /model command
-- Enhanced help command and opening message to include /search command
-- Updated README.md with DuckDuckGo search feature documentation
 
 ### Fixed
 - Fixed opening message box alignment - properly aligned text within the box borders

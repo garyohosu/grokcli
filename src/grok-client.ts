@@ -3,7 +3,6 @@ import ora from 'ora';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
-import chalk from 'chalk';
 
 const execAsync = promisify(exec);
 
@@ -125,7 +124,6 @@ export class GrokClient {
   private conversationHistory: GrokMessage[] = [];
   private tools: Tool[];
   private currentModel: string = 'grok-2-1212';
-  private verboseMode: boolean = false;
 
   // Available models and their aliases
   private static readonly MODEL_ALIASES: Record<string, string> = {
@@ -203,7 +201,6 @@ export class GrokClient {
 
       let iterations = 0;
       const maxIterations = 10; // Prevent infinite loops
-      let lastResponse: GrokChatResponse | null = null;
 
       while (iterations < maxIterations) {
         iterations++;
@@ -218,7 +215,6 @@ export class GrokClient {
         };
 
         const response = await this.client.post<GrokChatResponse>('/chat/completions', request);
-        lastResponse = response.data;
         const assistantMessage = response.data.choices[0].message;
 
         // Add assistant message to history
@@ -254,13 +250,6 @@ export class GrokClient {
 
         // No tool calls, return the final response
         spinner.succeed('Done');
-
-        // Show model info if verbose mode is enabled
-        if (this.verboseMode && lastResponse) {
-          const modelInfo = this.getResponseInfo(lastResponse);
-          return `${assistantMessage.content || 'No response from Grok.'}\n${modelInfo}`;
-        }
-
         return assistantMessage.content || 'No response from Grok.';
       }
 
@@ -273,10 +262,6 @@ export class GrokClient {
       }
       throw error;
     }
-  }
-
-  private getResponseInfo(response: GrokChatResponse): string {
-    return chalk.dim(`\n\n[Model: ${response.model} | Tokens: ${response.usage.prompt_tokens}→${response.usage.completion_tokens} (${response.usage.total_tokens} total)]`);
   }
 
   clearHistory(): void {
@@ -319,13 +304,5 @@ export class GrokClient {
 
   static getModelAliases(): Record<string, string> {
     return { ...GrokClient.MODEL_ALIASES };
-  }
-
-  setVerboseMode(enabled: boolean): void {
-    this.verboseMode = enabled;
-  }
-
-  getVerboseMode(): boolean {
-    return this.verboseMode;
   }
 }

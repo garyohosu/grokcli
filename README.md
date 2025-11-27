@@ -11,7 +11,6 @@ A command-line interface tool powered by the Grok API, providing an AI assistant
 - ⚡ Fast and lightweight
 - 🛠️ Function calling support - Grok can execute shell commands when needed
 - 🖥️ Cross-platform command execution (Windows/Linux/macOS)
-- 🔍 Web search integration with DuckDuckGo (no API key required)
 
 ## Installation
 
@@ -74,9 +73,6 @@ Inside the interactive mode, you can use these commands:
 
 - `/help` - Show available commands
 - `/clear` - Clear conversation history
-- `/model` - View or change AI model
-- `/verbose` - Toggle detailed model info
-- `/search <query>` - Search the web with DuckDuckGo
 - `/exit` - Exit the application
 - `/version` - Show version information
 - `/exec <command>` - Execute shell command directly
@@ -110,27 +106,6 @@ The AI automatically detects your operating system and uses the correct commands
 - And much more!
 
 **Note:** Shell commands are executed with the same permissions as your terminal session. Be cautious when allowing command execution.
-
-### Web Search (DuckDuckGo Integration)
-
-Search the web directly from the CLI without leaving your terminal:
-
-```bash
-> /search TypeScript best practices
-
-# Grok CLI will query DuckDuckGo and display:
-# - Title and summary of the topic
-# - Official documentation links
-# - Related topics and resources
-```
-
-The search feature uses the DuckDuckGo API, which is:
-- **Free** - No API key required
-- **Privacy-focused** - DuckDuckGo doesn't track your searches
-- **Fast** - Get instant results directly in your terminal
-- **Comprehensive** - Shows title, summary, URL, and up to 5 related topics
-
-Perfect for quick lookups without context switching!
 
 ## Development
 
