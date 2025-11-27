@@ -20,7 +20,13 @@
       "Bash(git checkout:*)",
       "Bash(mkdir:*)",
       "Bash(npm start)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(if exist \"%USERPROFILE%\\.grok_agent\" rmdir /s /q \"%USERPROFILE%\\.grok_agent\")",
+      "Bash(npx ts-node test-agent-workflow.ts)",
+      "Bash(npx ts-node:*)",
+      "Bash(cat:*)",
+      "Bash(test:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

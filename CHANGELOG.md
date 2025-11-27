@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Agent Mode core workflow** - Multi-agent autonomous loop (Planner, Executor, Reviewer, Updater, Final Agent) driven by `Agents.md` and workspace files in `~/.grok_agent`, producing `planner.md`, `executor.md`, `result.md`, `reviewer.md`, and `final_report.md`.
+- Agent runtime modules in `src/agent/` (`workspace.ts`, `init.ts`, `agents.ts`, `runner.ts`) for workspace management, goal hashing, auto-reset logic, template loading, and LLM orchestration.
+- Agent Mode templates in `src/agent/templates/*.md` and `~/.grok_agent/templates` implementing language-mirroring rules and structured prompts for planner, executor, reviewer, and final report generation.
+- Default CLI Agent Mode entrypoint: running `grokcli` with no arguments now starts Agent Mode, with an interactive interview flow to create `goal.md` when it is missing.
+- `--reset` CLI flag and workspace reset behavior to clean `~/.grok_agent` before starting a new Agent Mode run.
+- Agent Mode validation and QA documentation: `AGENT_VALIDATION_REPORT.md`, `INTEGRATION_TEST_REPORT.md`, and `TEST_SUMMARY.md` capturing unit, integration, and end-to-end test coverage for Agent Mode.
 - Created new feature branch `agent-mode-specs` for upcoming documentation and agent-mode development
 - **Documentation structure** - Complete documentation folder hierarchy with full specifications
 - docs/index.md - Main documentation entry point
@@ -76,6 +82,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - src/tools/fileTools.ts module with sandboxed file operations
 
 ### Changed
+- Default CLI behavior now launches Agent Mode when no command is provided; classic interactive chat mode is available via `grokcli chat`.
+- CLI help text and README updated to describe Agent Mode, the `~/.grok_agent` workspace, interview-driven `goal.md` creation, and safety constraints.
+- Workspace reset behavior updated so `grokcli --reset` clears the Agent Mode workspace before starting a new run.
 - **Configuration loading** - Now loads from global `~/.grokcli/.env` directory first, with fallback to local .env
 - Updated README.md with comprehensive global config setup instructions for all platforms
 - Migrated local .env to global ~/.grokcli/.env directory for cross-directory accessibility
@@ -94,6 +103,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated opening message to include /model command
 - Clarified README to remove the non-existent /verbose command and note /search uses SerpAPI with SERPAPI_KEY configuration
 ### Fixed
+- Agent Mode workspace auto-reset now deletes generated planner/executor/reviewer/result/final_report and `meta.json` files whenever the `goal.md` hash changes, ensuring fresh runs for updated goals.
 - Fixed opening message box alignment - properly aligned text within the box borders
 - Fixed 404 error from Grok API - updated model name from 'grok-beta' to 'grok-2-1212'
 - Improved command list formatting in opening message

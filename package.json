@@ -1,13 +1,14 @@
 {
   "name": "grokcli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A CLI tool powered by Grok API",
   "main": "dist/index.js",
   "bin": {
     "grokcli": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy-templates",
+    "copy-templates": "node -e \"const fs=require('fs');const path=require('path');const src=path.join('src','agent','templates');const dest=path.join('dist','agent','templates');fs.mkdirSync(dest,{recursive:true});fs.readdirSync(src).forEach(f=>{if(f.endsWith('.md'))fs.copyFileSync(path.join(src,f),path.join(dest,f))})\"",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js"
   },

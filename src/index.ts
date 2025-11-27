@@ -2,11 +2,16 @@
 
 import chalk from 'chalk';
 import * as readline from 'readline';
+import * as os from 'os';
+import * as path from 'path';
+import * as fs from 'fs/promises';
 import { GrokClient } from './grok-client';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { webSearch } from './tools/searchApi';
 import { loadConfig } from './config';
+import { ensureWorkspace, readFile, writeFile, cleanupGeneratedFiles, WORKSPACE_DIR } from './agent/workspace';
+import { runAgentWorkflow } from './agent/runner';
 
 const execAsync = promisify(exec);
 
@@ -15,7 +20,7 @@ loadConfig();
 
 const OPENING_MESSAGE = `
 ${chalk.cyan('╔══════════════════════════════════════════════════════════════╗')}
-${chalk.cyan('║')} ${chalk.bold('Grok CLI')} ${chalk.gray('- Interactive AI assistant in your terminal')}         ${chalk.cyan('║')}
+${chalk.cyan('║')} ${chalk.bold('Grok CLI')} ${chalk.gray('- Chat Mode')}                                     ${chalk.cyan('║')}
 ${chalk.cyan('║')}                                                              ${chalk.cyan('║')}
 ${chalk.cyan('║')} ${chalk.dim('Powered by Grok')}                                              ${chalk.cyan('║')}
 ${chalk.cyan('╚══════════════════════════════════════════════════════════════╝')}
@@ -31,6 +36,30 @@ Available commands:
 
 Just type your message to chat with Grok AI
 `;
+
+function printHelp() {
+  console.log(`
+${chalk.bold('Usage:')} grokcli [options] [command]
+
+${chalk.bold('Commands:')}
+  ${chalk.cyan('chat')}              Start classic interactive chat mode
+  ${chalk.cyan('help')}              Show this help message
+
+${chalk.bold('Default Behavior:')}
+  Running ${chalk.cyan('grokcli')} with no arguments starts Agent Mode automatically.
+
+${chalk.bold('Options:')}
+  ${chalk.cyan('--reset')}           Reset the workspace (~/.grok_agent)
+  ${chalk.cyan('--version')}         Show version information
+  ${chalk.cyan('--help')}            Show this help message
+
+${chalk.bold('Examples:')}
+  ${chalk.dim('grokcli')}            ${chalk.gray('# Start Agent Mode')}
+  ${chalk.dim('grokcli chat')}       ${chalk.gray('# Start chat mode')}
+  ${chalk.dim('grokcli --reset')}    ${chalk.gray('# Reset workspace and start Agent Mode')}
+  ${chalk.dim('grokcli --version')}  ${chalk.gray('# Show version')}
+`);
+}
 
 function showHelp() {
   console.log(`
@@ -290,5 +319,210 @@ async function startInteractiveMode() {
   });
 }
 
-// Start interactive mode directly
-startInteractiveMode();
+/**
+ * Run default agent mode workflow
+ */
+async function runDefaultAgentMode(reset: boolean = false) {
+  const apiKey = process.env.GROK_API_KEY;
+  if (!apiKey) {
+    console.error(chalk.red('\nError: GROK_API_KEY not found in environment variables'));
+    console.log(chalk.yellow('Please set your API key:'));
+    console.log(chalk.dim('  export GROK_API_KEY=your_api_key'));
+    console.log(chalk.dim('  or create a .env file with GROK_API_KEY=your_api_key\n'));
+    process.exit(1);
+  }
+
+  console.log(chalk.cyan('\n╔══════════════════════════════════════════════════════════════╗'));
+  console.log(chalk.cyan('║') + chalk.bold(' Grok CLI') + chalk.gray(' - Agent Mode (default)') + '                        ' + chalk.cyan('║'));
+  console.log(chalk.cyan('╚══════════════════════════════════════════════════════════════╝\n'));
+
+  try {
+    // Handle reset
+    if (reset) {
+      console.log(chalk.yellow('Resetting workspace...'));
+      try {
+        await fs.rm(WORKSPACE_DIR, { recursive: true, force: true });
+        console.log(chalk.green('✓ Workspace reset complete\n'));
+      } catch (error) {
+        console.log(chalk.dim('Workspace was already clean\n'));
+      }
+    }
+
+    // Initialize workspace
+    console.log(chalk.dim('Initializing workspace...'));
+    await ensureWorkspace();
+    console.log(chalk.green('✓ Workspace loaded') + chalk.dim(` (${WORKSPACE_DIR})\n`));
+
+    // Check if goal.md exists
+    const goalContent = await readFile('goal.md');
+
+    if (!goalContent) {
+      console.log(chalk.yellow('goal.md not found'));
+      console.log(chalk.dim('Starting interview mode to create your goal...\n'));
+
+      // Run interview mode
+      console.log(chalk.cyan('Interview Mode:'));
+      console.log(chalk.dim('Please describe what you would like the AI agent to achieve.\n'));
+
+      const grokClient = new GrokClient(apiKey);
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        prompt: chalk.blue('> ')
+      });
+
+      let userGoal = '';
+
+      console.log(chalk.bold('What would you like the AI agent to achieve?'));
+      rl.prompt();
+
+      rl.on('line', async (line: string) => {
+        userGoal = line.trim();
+
+        if (!userGoal) {
+          console.log(chalk.yellow('Please provide a goal description.'));
+          rl.prompt();
+          return;
+        }
+
+        rl.close();
+
+        console.log(chalk.dim('\nGenerating goal.md...\n'));
+
+        // Generate goal.md
+        const goalPrompt = `You are a goal definition assistant. Based on the user's request, create a clear, well-structured goal definition.
+
+User request: ${userGoal}
+
+Generate a goal.md file with the following structure:
+# Goal Definition
+
+## Output Language
+(User language detected as: English)
+
+## User Goal
+(One clear paragraph describing exactly what the user wants.)
+
+## Requirements
+- bullet list of mandatory conditions
+- constraints
+- success criteria
+
+## Output Format
+Describe the expected content and structure of final_report.md.`;
+
+        try {
+          const goalMd = await grokClient.chat(goalPrompt);
+          await writeFile('goal.md', goalMd);
+          console.log(chalk.green('✓ goal.md created successfully\n'));
+
+          // Proceed to agent workflow
+          console.log(chalk.dim('Starting agent workflow...\n'));
+          const result = await runAgentWorkflow(apiKey);
+
+          if (result.success) {
+            console.log(chalk.green('\n✓ Agent workflow completed successfully!'));
+            console.log(chalk.dim(`Completed in ${result.loops} loop(s)`));
+          } else {
+            console.log(chalk.yellow('\n⚠ Agent workflow completed with limitations'));
+            console.log(chalk.dim(`Completed ${result.loops} loop(s), but goal not fully achieved`));
+          }
+
+          if (result.finalReportPath) {
+            console.log(chalk.cyan('\nFinal report available at:'));
+            console.log(chalk.bold(result.finalReportPath) + '\n');
+          }
+
+          if (result.error) {
+            console.log(chalk.red('\nError: ' + result.error + '\n'));
+          }
+
+          process.exit(0);
+        } catch (error) {
+          console.error(chalk.red('\nError generating goal:'), error instanceof Error ? error.message : 'Unknown error');
+          process.exit(1);
+        }
+      });
+
+      rl.on('close', () => {
+        if (!userGoal) {
+          console.log(chalk.dim('\nOperation cancelled.\n'));
+          process.exit(0);
+        }
+      });
+
+    } else {
+      // goal.md exists - run agent workflow
+      console.log(chalk.green('✓ goal.md found'));
+      console.log(chalk.dim('Starting agent workflow...\n'));
+
+      const result = await runAgentWorkflow(apiKey);
+
+      if (result.success) {
+        console.log(chalk.green('\n✓ Agent workflow completed successfully!'));
+        console.log(chalk.dim(`Completed in ${result.loops} loop(s)`));
+      } else {
+        console.log(chalk.yellow('\n⚠ Agent workflow completed with limitations'));
+        console.log(chalk.dim(`Completed ${result.loops} loop(s), but goal not fully achieved`));
+      }
+
+      if (result.finalReportPath) {
+        console.log(chalk.cyan('\nFinal report available at:'));
+        console.log(chalk.bold(result.finalReportPath) + '\n');
+      }
+
+      if (result.error) {
+        console.log(chalk.red('\nError: ' + result.error + '\n'));
+      }
+    }
+
+  } catch (error) {
+    console.error(chalk.red('\nAgent mode error:'), error instanceof Error ? error.message : 'Unknown error');
+    process.exit(1);
+  }
+}
+
+/**
+ * Main entry point - handle CLI arguments
+ */
+async function main() {
+  const args = process.argv.slice(2);
+
+  // Check for help
+  if (args.includes('--help') || args[0] === 'help') {
+    printHelp();
+    return;
+  }
+
+  // Check for version
+  if (args.includes('--version')) {
+    showVersion();
+    return;
+  }
+
+  // Check for global --reset flag
+  const resetFlag = args.includes('--reset');
+  const filteredArgs = args.filter(arg => arg !== '--reset' && arg !== '--version' && arg !== '--help');
+
+  // Check for chat command
+  if (filteredArgs[0] === 'chat') {
+    if (resetFlag) {
+      // Reset workspace before entering chat mode
+      console.log(chalk.yellow('Resetting workspace...'));
+      try {
+        await fs.rm(WORKSPACE_DIR, { recursive: true, force: true });
+        console.log(chalk.green('✓ Workspace reset complete\n'));
+      } catch (error) {
+        console.log(chalk.dim('Workspace was already clean\n'));
+      }
+    }
+    startInteractiveMode();
+    return;
+  }
+
+  // Default: run Agent Mode
+  await runDefaultAgentMode(resetFlag);
+}
+
+// Start the application
+main();
