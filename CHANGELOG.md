@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Claude.md - Workflow instructions for Claude Code integration
 - Agents.md - Instructions for AI agents working on this project
 - Automated workflow for reading CHANGELOG.md on startup and updating it after work completion
+- **Global configuration directory** - Load .env from `~/.grokcli/.env` (macOS/Linux) or `%USERPROFILE%\.grokcli\.env` (Windows)
+- Config loading utility module (src/config.ts) with fallback to local .env
+- Cross-platform global config support allowing grokcli to run from any directory
 - Added /version command to opening message command list
 - Added /exec command for executing shell commands directly from Grok CLI
 - Command execution functionality with proper error handling and output display
@@ -44,6 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - src/tools/fileTools.ts module with sandboxed file operations
 
 ### Changed
+- **Configuration loading** - Now loads from global `~/.grokcli/.env` directory first, with fallback to local .env
+- Updated README.md with comprehensive global config setup instructions for all platforms
 - Integrated feature/search-api and feature/file-tools into master, unifying web search and file operation tools for function calling
 - Updated project documentation structure to include AI workflow guidelines
 - Improved opening message alignment - fixed box border spacing issues

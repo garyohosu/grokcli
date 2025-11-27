@@ -39,21 +39,48 @@ npm install -g grokcli
 
 ## Setup
 
+### 🔧 Configuration (API Keys)
+
+Grok CLI loads configuration from a global config directory:
+
+**macOS / Linux:**
+```
+~/.grokcli/.env
+```
+
+**Windows (PowerShell):**
+```
+$env:USERPROFILE\.grokcli\.env
+```
+
+This global config location allows grokcli to run from any directory without needing a local .env file.
+
+### Setup Steps
+
 1. Get your Grok API key from [X.AI](https://x.ai)
 
-2. Create a `.env` file in the project root:
+2. Create the global config directory and file:
+
+**macOS / Linux:**
+```bash
+mkdir -p ~/.grokcli
+nano ~/.grokcli/.env
+```
+
+**Windows (PowerShell):**
+```powershell
+mkdir $env:USERPROFILE\.grokcli
+notepad $env:USERPROFILE\.grokcli\.env
+```
+
+3. Add your API keys to the `.env` file:
 
 ```bash
 GROK_API_KEY=your_api_key_here
 SERPAPI_KEY=your_serpapi_key_here
 ```
 
-Or set the environment variables:
-
-```bash
-export GROK_API_KEY=your_api_key_here
-export SERPAPI_KEY=your_serpapi_key_here
-```
+**Alternative:** You can also create a `.env` file in the project directory as a fallback, but the global config is recommended for convenience.
 
 ## Usage
 

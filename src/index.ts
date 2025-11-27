@@ -3,14 +3,15 @@
 import chalk from 'chalk';
 import * as readline from 'readline';
 import { GrokClient } from './grok-client';
-import * as dotenv from 'dotenv';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { webSearch } from './tools/searchApi';
+import { loadConfig } from './config';
 
 const execAsync = promisify(exec);
 
-dotenv.config();
+// Load configuration from global config directory or local .env
+loadConfig();
 
 const OPENING_MESSAGE = `
 ${chalk.cyan('╔══════════════════════════════════════════════════════════════╗')}
