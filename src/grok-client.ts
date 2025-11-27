@@ -4,6 +4,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
 import { webSearch } from './tools/searchApi';
+import { readFile, writeFile, appendFile } from './tools/fileTools';
 
 const execAsync = promisify(exec);
 
@@ -110,6 +111,65 @@ function getShellTools(): Tool[] {
             },
           },
           required: ['query'],
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'readFile',
+        description: 'Read a text file from the project directory. Only UTF-8 text files are supported. Paths must be relative to project root.',
+        parameters: {
+          type: 'object',
+          properties: {
+            filePath: {
+              type: 'string',
+              description: 'Relative path to the file to read (e.g., "src/index.ts" or "README.md")',
+            },
+          },
+          required: ['filePath'],
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'writeFile',
+        description: 'Write content to a text file (UTF-8). Creates new file or overwrites existing. Paths must be relative to project root.',
+        parameters: {
+          type: 'object',
+          properties: {
+            filePath: {
+              type: 'string',
+              description: 'Relative path to the file to write (e.g., "output.txt" or "data/result.json")',
+            },
+            content: {
+              type: 'string',
+              description: 'The text content to write to the file',
+            },
+          },
+          required: ['filePath', 'content'],
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'appendFile',
+        description: 'Append text content to an existing file or create new file. Only UTF-8 text is supported. Paths must be relative to project root.',
+        parameters: {
+          type: 'object',
+          properties: {
+            filePath: {
+              type: 'string',
+              description: 'Relative path to the file to append to (e.g., "log.txt" or "data/output.log")',
+            },
+            content: {
+              type: 'string',
+              description: 'The text content to append to the file',
+            },
+          },
+          required: ['filePath', 'content'],
         },
       },
     },
@@ -283,6 +343,48 @@ export class GrokClient {
                   content: `Error: ${error.message}`,
                 });
               }
+            } else if (toolCall.function.name === 'readFile') {
+              const args = JSON.parse(toolCall.function.arguments);
+
+              spinner.text = `Reading: ${args.filePath}`;
+
+              const result = await readFile(args);
+
+              // Add tool response to conversation
+              this.conversationHistory.push({
+                role: 'tool',
+                tool_call_id: toolCall.id,
+                name: toolCall.function.name,
+                content: JSON.stringify(result),
+              });
+            } else if (toolCall.function.name === 'writeFile') {
+              const args = JSON.parse(toolCall.function.arguments);
+
+              spinner.text = `Writing: ${args.filePath}`;
+
+              const result = await writeFile(args);
+
+              // Add tool response to conversation
+              this.conversationHistory.push({
+                role: 'tool',
+                tool_call_id: toolCall.id,
+                name: toolCall.function.name,
+                content: JSON.stringify(result),
+              });
+            } else if (toolCall.function.name === 'appendFile') {
+              const args = JSON.parse(toolCall.function.arguments);
+
+              spinner.text = `Appending to: ${args.filePath}`;
+
+              const result = await appendFile(args);
+
+              // Add tool response to conversation
+              this.conversationHistory.push({
+                role: 'tool',
+                tool_call_id: toolCall.id,
+                name: toolCall.function.name,
+                content: JSON.stringify(result),
+              });
             }
           }
 

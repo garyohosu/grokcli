@@ -34,6 +34,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Search results display with title, URL, and snippet
 - Proper error handling for missing API keys and failed searches
 - SERPAPI_KEY environment variable support in .env configuration
+- **File operations function calling tools** - Read, write, and append files via function calling
+- `readFile` function calling tool for reading text files from project directory
+- `writeFile` function calling tool for creating or overwriting text files
+- `appendFile` function calling tool for appending content to files
+- Safety features: path traversal protection, project root restriction, UTF-8 only
+- Automatic directory creation when writing to nested paths
+- Comprehensive error handling for file operations
+- src/tools/fileTools.ts module with sandboxed file operations
 
 ### Changed
 - Updated project documentation structure to include AI workflow guidelines
