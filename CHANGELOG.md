@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed opening message box alignment - properly aligned text within the box borders
 - Fixed 404 error from Grok API - updated model name from 'grok-beta' to 'grok-2-1212'
 - Improved command list formatting in opening message
+- Corrected opening message right border spacing - adjusted text padding to match box width exactly
 
 ## [1.0.0] - 2025-11-27
 
