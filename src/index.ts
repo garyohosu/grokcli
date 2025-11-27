@@ -21,6 +21,7 @@ ${chalk.cyan('╚═════════════════════
 Available commands:
   ${chalk.cyan('/help')}     Show available commands
   ${chalk.cyan('/clear')}    Clear conversation history
+  ${chalk.cyan('/model')}    View or change AI model
   ${chalk.cyan('/exit')}     Exit the application
   ${chalk.cyan('/version')}  Show version information
   ${chalk.cyan('/exec')}     Execute shell command
@@ -34,6 +35,9 @@ ${chalk.bold('Grok CLI Commands:')}
 
   ${chalk.cyan('/help')}           Show this help message
   ${chalk.cyan('/clear')}          Clear the conversation history
+  ${chalk.cyan('/model')}          View current model
+  ${chalk.cyan('/model <name>')}   Change to a different model
+  ${chalk.cyan('/model list')}     List all available models
   ${chalk.cyan('/exit')}           Exit the application
   ${chalk.cyan('/version')}        Show version information
   ${chalk.cyan('/exec <command>')} Execute shell command
@@ -47,6 +51,52 @@ function showVersion() {
 ${chalk.bold('Grok CLI')} version ${chalk.cyan('1.0.0')}
 Powered by Grok API
 `);
+}
+
+function showCurrentModel(grokClient: GrokClient) {
+  const currentModel = grokClient.getCurrentModel();
+  console.log(`\n${chalk.bold('Current Model:')} ${chalk.cyan(currentModel)}\n`);
+}
+
+function listAvailableModels() {
+  const models = GrokClient.getAvailableModels();
+  const aliases = GrokClient.getModelAliases();
+
+  console.log(`\n${chalk.bold('Available Models:')}\n`);
+
+  models.forEach(model => {
+    const modelAliases = Object.entries(aliases)
+      .filter(([_, value]) => value === model)
+      .map(([key]) => key);
+
+    const uniqueAliases = [...new Set(modelAliases)].filter(alias => alias !== model);
+
+    if (uniqueAliases.length > 0) {
+      console.log(`  ${chalk.cyan(model)} ${chalk.dim('(aliases: ' + uniqueAliases.slice(0, 3).join(', ') + ')')}`);
+    } else {
+      console.log(`  ${chalk.cyan(model)}`);
+    }
+  });
+
+  console.log(`\n${chalk.dim('Popular aliases:')}`);
+  console.log(`  ${chalk.cyan('fast')}     - Latest fast reasoning model (4.1)`);
+  console.log(`  ${chalk.cyan('4')}        - Grok 4`);
+  console.log(`  ${chalk.cyan('3')}        - Grok 3`);
+  console.log(`  ${chalk.cyan('mini')}     - Grok 3 Mini (smaller, faster)`);
+  console.log(`  ${chalk.cyan('code')}     - Code-specialized model`);
+  console.log(`  ${chalk.cyan('vision')}   - Vision model`);
+  console.log(`  ${chalk.cyan('image')}    - Image generation model\n`);
+}
+
+function changeModel(grokClient: GrokClient, modelName: string) {
+  const result = grokClient.setModel(modelName);
+
+  if (result.success) {
+    console.log(`\n${chalk.green('✓')} Model changed to: ${chalk.cyan(result.model)}\n`);
+  } else {
+    console.log(`\n${chalk.red('✗')} ${result.error}`);
+    console.log(`${chalk.dim('Use')} ${chalk.cyan('/model list')} ${chalk.dim('to see available models\n')}`);
+  }
 }
 
 async function handleCommand(command: string, grokClient: GrokClient): Promise<boolean> {
@@ -80,6 +130,18 @@ async function handleCommand(command: string, grokClient: GrokClient): Promise<b
     return true;
   }
 
+  // Handle /model command separately as it needs the full command string
+  if (command.startsWith('/model ')) {
+    const modelArg = command.substring(7).trim();
+
+    if (modelArg.toLowerCase() === 'list') {
+      listAvailableModels();
+    } else {
+      changeModel(grokClient, modelArg);
+    }
+    return true;
+  }
+
   switch (cmd) {
     case '/help':
     case '/h':
@@ -90,6 +152,11 @@ async function handleCommand(command: string, grokClient: GrokClient): Promise<b
     case '/c':
       grokClient.clearHistory();
       console.log(chalk.dim('\nConversation history cleared.\n'));
+      return true;
+
+    case '/model':
+    case '/m':
+      showCurrentModel(grokClient);
       return true;
 
     case '/exit':

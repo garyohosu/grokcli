@@ -19,6 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform shell command execution with OS-specific command handling
 - Tool definitions for shell command execution with proper parameter validation
 - Iterative tool call handling with conversation context preservation
+- **Model management system** - View and change AI models dynamically
+- `/model` command to display current model
+- `/model <name>` command to change to a different model
+- `/model list` command to list all available models with aliases
+- Support for 11 different Grok models including Grok 4.1, Grok 4, Grok 3, and specialized models
+- Model alias system for convenient model switching (e.g., 'fast', '4', 'mini', 'code', 'vision')
+- Dynamic model switching without restarting the CLI
+- Model validation with helpful error messages
 
 ### Changed
 - Updated project documentation structure to include AI workflow guidelines
@@ -28,6 +36,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced Grok client to support OpenAI-compatible function calling API
 - Modified chat function to handle tool calls in a loop until final response
 - Updated README.md with function calling documentation and examples
+- Refactored GrokClient to manage current model state internally
+- Updated chat method to use instance model instead of parameter
+- Enhanced help command to include model management commands
+- Updated opening message to include /model command
 
 ### Fixed
 - Fixed opening message box alignment - properly aligned text within the box borders

@@ -123,6 +123,61 @@ export class GrokClient {
   private client: AxiosInstance;
   private conversationHistory: GrokMessage[] = [];
   private tools: Tool[];
+  private currentModel: string = 'grok-2-1212';
+
+  // Available models and their aliases
+  private static readonly MODEL_ALIASES: Record<string, string> = {
+    // Fast reasoning models
+    'grok-4.1-fast-reasoning': 'grok-4-1-fast-reasoning',
+    'grok-4.1-fast': 'grok-4-1-fast-reasoning',
+    '4.1-fast': 'grok-4-1-fast-reasoning',
+    'fast': 'grok-4-1-fast-reasoning',
+
+    // Fast non-reasoning models
+    'grok-4.1-fast-nr': 'grok-4-1-fast-non-reasoning',
+    '4.1-fast-nr': 'grok-4-1-fast-non-reasoning',
+
+    // Grok 4 Fast models
+    'grok-4-fast-r': 'grok-4-fast-reasoning',
+    '4-fast-r': 'grok-4-fast-reasoning',
+    'grok-4-fast-nr': 'grok-4-fast-non-reasoning',
+    '4-fast-nr': 'grok-4-fast-non-reasoning',
+
+    // Main models
+    'grok-4': 'grok-4',
+    '4': 'grok-4',
+    'grok-3': 'grok-3',
+    '3': 'grok-3',
+    'grok-3-mini': 'grok-3-mini',
+    '3-mini': 'grok-3-mini',
+    'mini': 'grok-3-mini',
+    'grok-2': 'grok-2-1212',
+    '2': 'grok-2-1212',
+
+    // Code model
+    'code': 'grok-code-fast-1',
+    'grok-code': 'grok-code-fast-1',
+
+    // Vision and image models
+    'vision': 'grok-2-vision-1212',
+    'grok-vision': 'grok-2-vision-1212',
+    'image': 'grok-2-image-1212',
+    'grok-image': 'grok-2-image-1212',
+  };
+
+  private static readonly AVAILABLE_MODELS = [
+    'grok-4-1-fast-reasoning',
+    'grok-4-1-fast-non-reasoning',
+    'grok-4-fast-reasoning',
+    'grok-4-fast-non-reasoning',
+    'grok-code-fast-1',
+    'grok-4',
+    'grok-3',
+    'grok-3-mini',
+    'grok-2-vision-1212',
+    'grok-2-image-1212',
+    'grok-2-1212',
+  ];
 
   constructor(apiKey: string, baseURL: string = 'https://api.x.ai/v1') {
     this.client = axios.create({
@@ -135,7 +190,7 @@ export class GrokClient {
     this.tools = getShellTools();
   }
 
-  async chat(message: string, model: string = 'grok-2-1212'): Promise<string> {
+  async chat(message: string): Promise<string> {
     const spinner = ora('Thinking...').start();
 
     try {
@@ -152,7 +207,7 @@ export class GrokClient {
 
         const request: GrokChatRequest = {
           messages: this.conversationHistory,
-          model,
+          model: this.currentModel,
           stream: false,
           temperature: 0.7,
           tools: this.tools,
@@ -215,5 +270,39 @@ export class GrokClient {
 
   getHistory(): GrokMessage[] {
     return [...this.conversationHistory];
+  }
+
+  getCurrentModel(): string {
+    return this.currentModel;
+  }
+
+  setModel(modelNameOrAlias: string): { success: boolean; model?: string; error?: string } {
+    const normalizedInput = modelNameOrAlias.toLowerCase().trim();
+
+    // Check if it's an alias
+    const resolvedModel = GrokClient.MODEL_ALIASES[normalizedInput];
+    if (resolvedModel) {
+      this.currentModel = resolvedModel;
+      return { success: true, model: resolvedModel };
+    }
+
+    // Check if it's a valid model name directly
+    if (GrokClient.AVAILABLE_MODELS.includes(modelNameOrAlias)) {
+      this.currentModel = modelNameOrAlias;
+      return { success: true, model: modelNameOrAlias };
+    }
+
+    return {
+      success: false,
+      error: `Unknown model: ${modelNameOrAlias}`,
+    };
+  }
+
+  static getAvailableModels(): string[] {
+    return [...GrokClient.AVAILABLE_MODELS];
+  }
+
+  static getModelAliases(): Record<string, string> {
+    return { ...GrokClient.MODEL_ALIASES };
   }
 }
