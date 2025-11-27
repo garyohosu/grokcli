@@ -13,9 +13,9 @@ dotenv.config();
 
 const OPENING_MESSAGE = `
 ${chalk.cyan('╔══════════════════════════════════════════════════════════════╗')}
-${chalk.cyan('║')} ${chalk.bold('Grok CLI')} ${chalk.gray('- Interactive AI assistant in your terminal')}               ${chalk.cyan('║')}
+${chalk.cyan('║')} ${chalk.bold('Grok CLI')} ${chalk.gray('- Interactive AI assistant in your terminal')}         ${chalk.cyan('║')}
 ${chalk.cyan('║')}                                                              ${chalk.cyan('║')}
-${chalk.cyan('║')} ${chalk.dim('Powered by Grok')}                                                ${chalk.cyan('║')}
+${chalk.cyan('║')} ${chalk.dim('Powered by Grok')}                                              ${chalk.cyan('║')}
 ${chalk.cyan('╚══════════════════════════════════════════════════════════════╝')}
 
 Available commands:
